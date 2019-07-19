@@ -1,7 +1,7 @@
 'use strict'
 
-const debug = require('debug')('gu:api:server')
 const chalk = require('chalk')
+const debug = require('debug')('gu:api:server')
 
 const http = require('http')
 const express = require('express')
