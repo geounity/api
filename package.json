@@ -1,0 +1,39 @@
+{
+  "name": "gu-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Moderator app of the points of view nin debates - API",
+  "main": "server.js",
+  "scripts": {
+    "test": "DEBUG=gu:* ava tests/ --verbose",
+    "start": "NODE_ENV=production node server.js",
+    "start-dev": "DEBUG=gu:* nodemon server.js --verbose",
+    "lint": "standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geounity/geounity.git"
+  },
+  "author": "Seba <sebastiancardoso92@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/geounity/geounity/issues"
+  },
+  "homepage": "https://github.com/geounity/geounity#readme",
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "nodemon": "^1.18.5",
+    "standard": "^11.0.1",
+    "supertest": "^3.3.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "chalk": "^2.4.1",
+    "debug": "^4.1.0",
+    "express": "^4.16.4",
+    "express-jwt": "^5.3.1",
+    "express-jwt-permissions": "^1.2.3",
+    "gu-db": "file:../gu-db",
+    "jsonwebtoken": "^8.3.0"
+  }
+}
