@@ -5,7 +5,7 @@ const express = require('express')
 const auth = require('express-jwt')
 const guard = require('express-jwt-permissions')()
 const db = require('gu-db')
-const config = require('../gu-db/config')
+const config = require('../db/config')
 const configApi = require('./config')
 
 const api = express.Router()
