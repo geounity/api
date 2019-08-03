@@ -4,13 +4,15 @@ const debug = require('debug')('gu:api:routes')
 const express = require('express')
 const auth = require('express-jwt')
 const guard = require('express-jwt-permissions')()
-const db = require('gu-db')
+const db = require('db')
 const config = require('../db/config')
 const configApi = require('./config')
 
 const api = express.Router()
 
-let services, Geocommunity, Country, User
+const apiRestCountries = require('./services_external/api_countriesrest')
+
+let services, Geocommunity, Country, State, User
 
 const southamerica = [{ name: 'Argentina' }, { name: 'Bolivia' }, { name: 'Brasil' }, { name: 'Colombia' }, { name: 'Chile' }, { name: 'Ecuador' }, { name: 'Guyana' }, { name: 'Guyana' }, { name: 'francesa' }, { name: 'Paraguay' }, { name: 'Peru' }, { name: 'Surinam' }, { name: 'Venezuela' }, { name: 'Uruguay' }]
 const northamerica = [{ name: 'Anguila' }, { name: 'Antigua y Barbuda' }, { name: 'Aruba' }, { name: 'Bahamas' }, { name: 'Barbados' }, { name: 'Belize' }, { name: 'Bermuda' }, { name: 'Bonaire Sint Eustatius and Saba' }, { name: 'Estados Unidos' }, { name: 'Canada' }, { name: 'Islas caiman' }, { name: 'Costa rica' }, { name: 'Cuba' }, { name: 'Dominicana' }, { name: 'El  Salvador' }, { name: 'Honduras' }, { name: 'Jamaica' }, { name: 'Martinique' }, { name: 'Panama' }, { name: 'Puerto Rico' }, { name: 'Trinidad y tobago' }]
@@ -27,6 +29,7 @@ api.use('*', async (req, res, next) => {
     }
     Geocommunity = services.Geocommunity
     Country = services.Country
+    State = services.State
 
   }
   next()
@@ -78,15 +81,44 @@ api.get('/country/:code', async (req, res, next) => {
   }
   res.send(country) 
 })
+api.get('/:countryCode/states', async (req, res, next) => {
+  let { countryCode } = req.params
+  debug(`All info of states in country ${countryCode}`)
+  let country = {}
+  try {
+    country = await Country.getByCode(countryCode)
+  } catch (e) {
+    next(e)
+  }
+  console.log('COUNTRY-----')
+  console.log(country)
+  let states = {}
+  try {
+    states = await State.getAllByCountry(country.id)
+  } catch (e) {
+    next(e)
+  }
+  res.send(states)
+})
 
 api.get('/community/:name')
 api.get('/countries', (req, res) => {
   res.send('Paises')
 })
 
-api.get('/:country/:state')
 api.get('/:country/:state/:city')
-
+api.get('/population', async (req, res, next) => {
+  try {
+    let countries = await apiRestCountries.get('/all')
+    let populationTotal = countries.data.reduce((acum, { population }) => acum + population, 0)
+    console.log('RESULTADO')
+    res.send({
+      'total': populationTotal
+    })
+  } catch (e) {
+    console.log('Error: ', e)
+  }
+})
 
 api.get('/test', (req, res, next) => {
   debug('Test')
