@@ -22,7 +22,9 @@
   "homepage": "https://github.com/geounity/geounity#readme",
   "devDependencies": {
     "debug": "^4.1.0",
+    "event-stream": ">=4.0.0",
     "js-yaml": ">=3.13.1",
+    "lodash": ">=4.17.13",
     "lodash.merge": ">=4.6.2",
     "nodemon": "^1.18.5",
     "standard": "^11.0.1"
