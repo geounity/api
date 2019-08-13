@@ -2,17 +2,15 @@
 
 const chalk = require('chalk')
 const debug = require('debug')('gu:api:server')
+const bodyParser = require('body-parser')
 
 const http = require('http')
 const express = require('express')
-const bodyParser = require('body-parser')
-
 const port = process.env.PORT || 4949
 const app = express()
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
-// parse application/json
+
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 const server = http.createServer(app)
 
 const api = require('./api')

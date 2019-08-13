@@ -10,7 +10,7 @@ const configApi = require('./config')
 
 const api = express.Router()
 
-const apiRestCountries = require('./services_external/api_countriesrest')
+const apiRestCountries = require('./services/external/api_countriesrest')
 
 let services, Geocommunity, Country, State, User
 
@@ -30,6 +30,7 @@ api.use('*', async (req, res, next) => {
     Geocommunity = services.Geocommunity
     Country = services.Country
     State = services.State
+    User = services.User
 
   }
   next()
@@ -39,6 +40,16 @@ api.use('*', async (req, res, next) => {
 // GET
 // ------------
 
+api.get('/', function (req, res) {
+
+  res.status(200).json({
+    data: {
+      southamerica,
+      northamerica
+    },
+    message: 'countries listed'
+  })
+})
 // Communities
 
 // All continents
@@ -73,6 +84,7 @@ api.get('/:continent/countries', async (req, res, next) => {
 api.get('/country/:code', async (req, res, next) => {
   let { code } = req.params
   debug(`All info of country with code ${code}`)
+  code = code.toUpperCase()
   let country = {}
   try{
     country = await Country.getByCode(code)
@@ -102,11 +114,18 @@ api.get('/:countryCode/states', async (req, res, next) => {
 })
 
 api.get('/community/:name')
-api.get('/countries', (req, res) => {
-  res.send('Paises')
+api.get('/countries', (req, res, next) => {
+  apiRestCountries.get('/')
+    .then((countries) => {
+      let { data } = countries
+      res.send(data)
+    })
+    .catch((e) => {
+      next(e)
+    })
 })
 
-api.get('/:country/:state/:city')
+api.get('/:country/:state/:cit y')
 api.get('/population', async (req, res, next) => {
   try {
     let countries = await apiRestCountries.get('/all')
@@ -221,20 +240,31 @@ api.get('/user/:username', async (req, res, next) => {
   } catch (e) {
     next(e)
   }
-  res.send(user)
+  res.send(user?true:false)
 })
 
 
 // ------------
 // POST
 // ------------
+api.post('/', function (req, res) {
+
+  res.status(201).json({
+    data: {
+      southamerica,
+      northamerica
+    },
+    message: 'countries listed'
+  })
+})
 api.post('/signup', async (req, res, next) => {
   debug('Post signup')
   const { body } = req
   let user = {
     username: body.username,
     email: body.email,
-    password: body.password
+    password: body.password,
+    id_doc_firestore: body.idDoc
   }
   let result = {}
   try {
@@ -244,7 +274,6 @@ api.post('/signup', async (req, res, next) => {
     console.log(e.message)
     res.status(400).send({ error: e.message })
   }
-
 })
 api.post('/debate', async (req, res, params) => {
   try {
@@ -256,6 +285,51 @@ api.post('/debate', async (req, res, params) => {
   } catch (e) {
     return send(res, 401, { error: 'invalid token'})
   }
+})
+
+// ------------
+// PUT
+// ------------
+// En el navegador me sale este error con put:
+// Method PUT is not allowed by Access - Control - Allow - Methods in preflight response.
+// Por eso uso post provisoriamente hasta que descubra por qué.
+api.post('/:username/aditional-info', async (req, res, next) => {
+  debug('Complete info user')
+  const { body } = req
+  const { params } = req
+  const username = params.username
+  let result = {}
+  let info = {
+    name: body.name,
+    lastname: body.lastname,
+    datebirth: body.datebirth,
+    service: body.service
+  }
+  console.log('info')
+  console.log(info)
+  try {
+    result = await User.addAditionalInfo(username, info)
+    res.send(result)
+  } catch (e) {
+    console.log('e.message')
+    console.log(e.message)
+    res.status(400).send({ error: e.message })
+  }
+})
+api.post('/:username/addphoto', async (req, res, next) => {
+  debug('Add photo user')
+  const { body } = req
+  const { params } = req
+  const username = params.username
+  let result = {}
+  try {
+    result = await User.addPhotoURL(username, body.filename )
+    res.send(result)
+  } catch (e) {
+    console.log('e.message')
+    console.log(e.message)
+    res.status(400).send({ error: e.message })
+  }  
 })
 
 module.exports = api
