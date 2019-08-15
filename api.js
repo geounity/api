@@ -125,7 +125,7 @@ api.get('/countries', (req, res, next) => {
     })
 })
 
-api.get('/:country/:state/:cit y')
+api.get('/:country/:state/:city')
 api.get('/population', async (req, res, next) => {
   try {
     let countries = await apiRestCountries.get('/all')
@@ -242,7 +242,17 @@ api.get('/user/:username', async (req, res, next) => {
   }
   res.send(user?true:false)
 })
-
+api.get('/user/email/:email', async (req, res, next) => {
+  debug('A request has come to /username')
+  const { email } = req.params
+  let user = {}
+  try {
+    user = await User.findByEmail(email)
+  } catch (e) {
+    next(e)
+  }
+  res.send(user)
+})
 
 // ------------
 // POST
@@ -303,7 +313,8 @@ api.post('/:username/aditional-info', async (req, res, next) => {
     name: body.name,
     lastname: body.lastname,
     datebirth: body.datebirth,
-    service: body.service
+    service: body.service,
+    photo: body.fileName
   }
   console.log('info')
   console.log(info)
@@ -317,10 +328,12 @@ api.post('/:username/aditional-info', async (req, res, next) => {
   }
 })
 api.post('/:username/addphoto', async (req, res, next) => {
-  debug('Add photo user')
   const { body } = req
   const { params } = req
   const username = params.username
+  debug('Add photo user')
+  debug(`Username: ${username}`)
+  console.log(body)
   let result = {}
   try {
     result = await User.addPhotoURL(username, body.filename )
