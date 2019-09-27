@@ -1,2 +1,8 @@
 /node_modules
 config.js
+
+/db/node_modules
+/db/.env
+/db/.nyc_output
+/db/coverage
+/db/config.js
